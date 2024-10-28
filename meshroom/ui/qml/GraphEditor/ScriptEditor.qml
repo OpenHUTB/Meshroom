@@ -8,6 +8,8 @@ import MaterialIcons 2.2
 import Qt.labs.platform 1.0 as Platform
 import QtQuick.Dialogs 1.3
 
+import ScriptEditor 1.0
+
 Item {
     id: root
 
@@ -337,6 +339,13 @@ Item {
                         lineNumbers.contentY = contentY
                     }
                 }
+            }
+
+            // Syntax Highlights for the Input Area for Python Based Syntax
+            PySyntaxHighlighter {
+                id: syntaxHighlighter
+                // The document to highlight
+                textDocument: input.textDocument
             }
         }
     }
