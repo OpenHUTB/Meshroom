@@ -431,7 +431,7 @@ class Graph(BaseObject):
         # Second pass to update all the links in the input/output attributes for every node with the new names
         for nodeName, nodeData in updatedData.items():
             nodeType = nodeData.get("nodeType", None)
-            nodeDesc = meshroom.core.nodesDesc[nodeType]
+            nodeDesc = meshroom.core.pluginManager.descriptor(nodeType)
 
             inputs = nodeData.get("inputs", {})
             outputs = nodeData.get("outputs", {})

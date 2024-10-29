@@ -491,9 +491,9 @@ class BaseNode(BaseObject):
         self._nodeType = nodeType
         self.nodeDesc = None
 
-        # instantiate node description if nodeType is valid
-        if nodeType in meshroom.core.nodesDesc:
-            self.nodeDesc = meshroom.core.nodesDesc[nodeType]()
+        # instantiate node description if nodeType has been registered
+        if meshroom.core.pluginManager.registered(nodeType):
+            self.nodeDesc = meshroom.core.pluginManager.descriptor(nodeType)()
 
         self.packageName = self.packageVersion = ""
         self._internalFolder = ""
@@ -1852,11 +1852,11 @@ def nodeFactory(nodeDict, name=None, template=False, uidConflict=False):
 
     compatibilityIssue = None
 
-    nodeDesc = None
-    try:
-        nodeDesc = meshroom.core.nodesDesc[nodeType]
-    except KeyError:
-        # Unknown node type
+    # Returns the desc.Node inherited class or None if the plugin was not registered
+    nodeDesc = meshroom.core.pluginManager.descriptor(nodeType)
+
+    # Node plugin was not registered
+    if not nodeDesc:
         compatibilityIssue = CompatibilityIssue.UnknownNodeType
 
     # Unknown node type should take precedence over UID conflict, as it cannot be resolved

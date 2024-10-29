@@ -10,7 +10,7 @@ from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication
 
 import meshroom
-from meshroom.core import nodesDesc
+from meshroom.core import pluginManager
 from meshroom.core.taskManager import TaskManager
 from meshroom.common import Property, Variant, Signal, Slot
 
@@ -241,6 +241,7 @@ class MeshroomApp(QApplication):
         components.registerTypes()
 
         # expose available node types that can be instantiated
+        nodesDesc = pluginManager.descriptors
         self.engine.rootContext().setContextProperty("_nodeTypes", {n: {"category": nodesDesc[n].category} for n in sorted(nodesDesc.keys())})
 
         # instantiate Reconstruction object

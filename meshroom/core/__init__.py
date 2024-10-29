@@ -20,6 +20,7 @@ except Exception:
 
 from meshroom.core.submitter import BaseSubmitter
 from . import desc
+from . import _plugins
 
 # Setup logging
 logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=logging.INFO)
@@ -29,9 +30,11 @@ sessionUid = str(uuid.uuid1())
 
 cacheFolderName = 'MeshroomCache'
 defaultCacheFolder = os.environ.get('MESHROOM_CACHE', os.path.join(tempfile.gettempdir(), cacheFolderName))
-nodesDesc = {}
 submitters = {}
 pipelineTemplates = {}
+
+# Manages plugins for Meshroom Nodes
+pluginManager = _plugins.NodePluginManager()
 
 
 def hashValue(value):
@@ -283,17 +286,14 @@ def registerNodeType(nodeType):
 
     After registration, nodes of this type can be instantiated in a Graph.
     """
-    global nodesDesc
-    if nodeType.__name__ in nodesDesc:
-        logging.error("Node Desc {} is already registered.".format(nodeType.__name__))
-    nodesDesc[nodeType.__name__] = nodeType
+    # Register the node in plugin manager
+    pluginManager.registerNode(nodeType)
 
 
 def unregisterNodeType(nodeType):
     """ Remove 'nodeType' from the list of register node types. """
-    global nodesDesc
-    assert nodeType.__name__ in nodesDesc
-    del nodesDesc[nodeType.__name__]
+    # Unregister the node from plugin manager
+    pluginManager.unregisterNode(nodeType)
 
 
 def loadNodes(folder, packageName):
@@ -301,7 +301,6 @@ def loadNodes(folder, packageName):
 
 
 def loadAllNodes(folder):
-    global nodesDesc
     for importer, package, ispkg in pkgutil.walk_packages([folder]):
         if ispkg:
             nodeTypes = loadNodes(folder, package)
